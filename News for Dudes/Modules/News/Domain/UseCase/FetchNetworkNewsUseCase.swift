@@ -9,7 +9,7 @@ import Combine
 
 
 protocol FetchNetworkNewsUseCaseProtocol{
-    func executeFetch()-> AnyPublisher<[NetworkNews],any Error>
+    func executeFetch(category:NewsCategory)-> AnyPublisher<[NetworkNews],any Error>
 }
 
 final class FetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol {
@@ -20,8 +20,8 @@ final class FetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol {
         self.repository = repository
     }
     
-    func executeFetch() -> AnyPublisher<[NetworkNews], any Error> {
-        repository.fetchNetworkNews()
+    func executeFetch(category:NewsCategory) -> AnyPublisher<[NetworkNews], any Error> {
+        repository.fetchNetworkNews(category: category)
     }
     
 }

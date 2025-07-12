@@ -8,5 +8,5 @@
 import Combine
 
 protocol FetchNetworkNewsDataSourceProtocol {
-    func getNetworkNews() -> AnyPublisher<[NetworkNews],any Error>
+    func getNetworkNews(category:NewsCategory) -> AnyPublisher<[NetworkNews],any Error>
 }

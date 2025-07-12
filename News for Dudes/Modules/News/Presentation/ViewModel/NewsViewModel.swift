@@ -9,17 +9,17 @@ import Foundation
 import Combine
 
 class NewsViewModel {
-    
     @Published var news: [NetworkNews] = []
     private var cancelables = Set<AnyCancellable>()
     
+
     let fetchNetworkNewsUseCase:FetchNetworkNewsUseCaseProtocol
     init(fetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol) {
         self.fetchNetworkNewsUseCase = fetchNetworkNewsUseCase
     }
     
-    func getNews() {
-        fetchNetworkNewsUseCase.executeFetch()
+    func getNews(category:NewsCategory) {
+        fetchNetworkNewsUseCase.executeFetch(category: category)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
