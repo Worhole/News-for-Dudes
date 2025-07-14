@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import Combine
 
 protocol NewsDetailDataSourceProtocol{
     func deleteNews()
-    func getNews() -> AnyPublisher<NewsDetailModel,Error>
+    func getNews(completion: @escaping (Result<NewsDetailModel, Error>) -> Void)
     func saveNews()
     func isNewsSaved()->Bool
 }

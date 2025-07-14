@@ -15,8 +15,8 @@ final class FetchNetworkNewsRepository: FetchNetworkNewsRepositoryProtocol {
         self.dataSource = dataSource
     }
     
-    func fetchNetworkNews(category:NewsCategory) -> AnyPublisher<[NetworkNews],any Error> {
-        dataSource.fetchNetworkNews(category: category)
+    func fetchNetworkNews(category: NewsCategory, completion: @escaping (Result<[NetworkNews], any Error>) -> Void) {
+        dataSource.fetchNetworkNews(category: category, completion: completion)
     }
 
 }

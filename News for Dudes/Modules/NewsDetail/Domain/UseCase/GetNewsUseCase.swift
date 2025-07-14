@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import Combine
+
 
 protocol GetNewsUseCaseProtocol{
-    func executeGetNews() -> AnyPublisher<NewsDetailModel,Error>
+    func executeGetNews(completion: @escaping (Result<NewsDetailModel, Error>) -> Void)
 }
 
 final class GetNewsUseCase:GetNewsUseCaseProtocol {
@@ -20,8 +20,8 @@ final class GetNewsUseCase:GetNewsUseCaseProtocol {
         self.repository = repository
     }
     
-    
-    func executeGetNews() -> AnyPublisher<NewsDetailModel, any Error> {
-        repository.getNews()
+    func executeGetNews(completion: @escaping (Result<NewsDetailModel, any Error>) -> Void) {
+        repository.getNews(completion: completion)
     }
+   
 }

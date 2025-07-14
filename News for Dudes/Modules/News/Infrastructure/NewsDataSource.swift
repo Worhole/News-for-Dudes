@@ -9,20 +9,21 @@ import Combine
 import Foundation
 
 final class NewsDataSource:NewsDataSourceProtocol {
-    func fetchNetworkNews(category: NewsCategory) -> AnyPublisher<[NetworkNews], any Error> {
+    func fetchNetworkNews(category: NewsCategory, completion: @escaping (Result<[NetworkNews], any Error>) -> Void) {
         guard let url = NewsURLBuilder(newsCategory: category).url else {
-            return Fail(error: URLError.badURL as! Error).eraseToAnyPublisher()
+            completion(.failure(URLError.badURL as! Error))
+            return
         }
-        
-        let dataPublisher = URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: Articles.self, decoder: JSONDecoder())
-            .map{
-                $0.articles
-        }
-            .eraseToAnyPublisher()
+        URLSession.shared.dataTask(with: url){ data,_,error in
+            if let error = error {
+                print(error)
+            }
+            guard let data = data, let decodeData = try? JSONDecoder().decode(Articles.self, from: data) else { completion(.failure(URLError.dataNotAllowed as! Error))
+                return}
             
-        return dataPublisher
+            completion(.success(decodeData.articles))
+        }.resume()
     }
+
 }
 

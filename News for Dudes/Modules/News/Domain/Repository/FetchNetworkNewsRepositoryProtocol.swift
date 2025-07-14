@@ -9,5 +9,5 @@ import Combine
 
 
 protocol FetchNetworkNewsRepositoryProtocol {
-    func fetchNetworkNews(category:NewsCategory) -> AnyPublisher<[NetworkNews],any Error>
+    func fetchNetworkNews(category: NewsCategory, completion: @escaping (Result<[NetworkNews], Error>) -> Void)
 }

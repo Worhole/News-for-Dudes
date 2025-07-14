@@ -41,18 +41,16 @@ class BookmarksViewController: UIViewController {
 
 private extension BookmarksViewController {
     func setupBind(){
-        viewModel?.$bookmarks
-            .receive(on: DispatchQueue.main)
-            .sink{_ in
-                self.bookmarksTableView.reloadData()
-            }
-            .store(in: &subscriptions)
+        viewModel?.bookmarks.bind({ [weak self ] _ in
+            guard let self = self else {return}
+            self.bookmarksTableView.reloadData()
+        })
     }
 }
 
 extension BookmarksViewController:UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let news = viewModel?.bookmarks[indexPath.row] else{
+        guard let news = viewModel?.bookmarks.value[indexPath.row] else{
             print("ошибка данных: news = nil")
             return}
         let vc = NewsDetailModuleBuilder.build(data: news.toDisplayModel(), mode: .bookmarks, close: { [weak self] in
@@ -65,14 +63,14 @@ extension BookmarksViewController:UITableViewDelegate{
 
 extension BookmarksViewController:UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel?.bookmarks.count ?? 0
+        viewModel?.bookmarks.value.count ?? 0
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.reuseId) as! NewsTableViewCell
         
-        cell.configue(title: viewModel?.bookmarks[indexPath.row].title,
-                      description: viewModel?.bookmarks[indexPath.row].newsDescription,
-                      source: viewModel?.bookmarks[indexPath.row].source)
+        cell.configue(title: viewModel?.bookmarks.value[indexPath.row].title,
+                      description: viewModel?.bookmarks.value[indexPath.row].newsDescription,
+                      source: viewModel?.bookmarks.value[indexPath.row].source)
         return cell
     }
 }

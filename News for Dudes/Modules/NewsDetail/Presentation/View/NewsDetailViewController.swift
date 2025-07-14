@@ -6,12 +6,11 @@
 //
 
 import UIKit
-import Combine
+
 
 
 class NewsDetailViewController: UIViewController {
     
-    private var subscriptions = Set<AnyCancellable>()
     var viewModel:NewsDetailViewModel?
 
     lazy var content:UIView = {
@@ -27,8 +26,8 @@ class NewsDetailViewController: UIViewController {
     }(UIScrollView(frame: view.frame))
     
     lazy var barButton:UIButton = {
-        $0.setTitle(viewModel!.isSaved ? "Delete" : "Save", for: .normal)
-        $0.backgroundColor = viewModel!.isSaved ? #colorLiteral(red: 1, green: 0.2153770328, blue: 0.3606185019, alpha: 1) : #colorLiteral(red: 0.09206429869, green: 0.4222652912, blue: 0.9932720065, alpha: 1)
+        $0.setTitle(viewModel!.currentIsSaved ? "Delete" : "Save", for: .normal)
+        $0.backgroundColor = viewModel!.currentIsSaved ? #colorLiteral(red: 1, green: 0.2153770328, blue: 0.3606185019, alpha: 1) : #colorLiteral(red: 0.09206429869, green: 0.4222652912, blue: 0.9932720065, alpha: 1)
         $0.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
         $0.tintColor = .white
         $0.layer.cornerRadius = 15
@@ -99,25 +98,23 @@ class NewsDetailViewController: UIViewController {
         viewModel?.getNews()
         setupBind()
         setupLayout()
+        updateBarButton()
     }
 }
 
 private extension NewsDetailViewController {
     func setupBind(){
-        viewModel?.$viewData
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { data in
-                self.setData(data: data)
-            })
-            .store(in: &subscriptions)
-        
-        viewModel?.$isSaved
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateBarButton()
-            }
-            .store(in: &subscriptions)
+        viewModel?.viewData = { [weak self] data in
+               DispatchQueue.main.async {
+                   self?.setData(data: data)
+               }
+           }
 
+           viewModel?.isSaved = { [weak self] _ in
+               DispatchQueue.main.async {
+                   self?.updateBarButton()
+               }
+           }
     }
 }
 
@@ -215,9 +212,9 @@ private extension NewsDetailViewController {
 private extension NewsDetailViewController {
     func updateBarButton(){
         guard let button = navigationItem.rightBarButtonItem?.customView as? UIButton else { return }
-        let isSaved = viewModel?.isSaved ?? false
+        let isSaved = viewModel?.currentIsSaved ?? false
         button.setTitle(isSaved ? "Delete" : "Save", for: .normal)
-        button.backgroundColor = viewModel!.isSaved ? #colorLiteral(red: 1, green: 0.2153770328, blue: 0.3606185019, alpha: 1) : #colorLiteral(red: 0.09206429869, green: 0.4222652912, blue: 0.9932720065, alpha: 1)
+        button.backgroundColor = isSaved ? #colorLiteral(red: 1, green: 0.2153770328, blue: 0.3606185019, alpha: 1) : #colorLiteral(red: 0.09206429869, green: 0.4222652912, blue: 0.9932720065, alpha: 1)
     }
     @objc
     func buttonTapped(){

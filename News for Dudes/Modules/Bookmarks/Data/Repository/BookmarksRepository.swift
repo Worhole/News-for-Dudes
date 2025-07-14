@@ -15,8 +15,8 @@ final class BookmarksRepository: BookmarksRepositoryProtocol {
         self.dataSource = dataSource
     }
     
-    func fetchBookmarks() -> AnyPublisher<[Bookmarks], any Error> {
-         dataSource.fetchBookmarks()
+    func fetchBookmarks(completion: @escaping (Result<[Bookmarks], Error>) -> Void){
+        dataSource.fetchBookmarks(completion: completion)
     }
 
 }

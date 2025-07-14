@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 protocol SaveNewsUseCaseProtocol {
     func executeSaveNews()
@@ -19,7 +18,6 @@ final class SaveNewsUseCase:SaveNewsUseCaseProtocol{
     init(repository: NewsDetailRepositoryProtocol) {
         self.repository = repository
     }
-    
     
     func executeSaveNews() {
         repository.saveNews()

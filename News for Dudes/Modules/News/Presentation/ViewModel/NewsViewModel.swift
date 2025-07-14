@@ -6,11 +6,9 @@
 //
 
 import Foundation
-import Combine
 
 class NewsViewModel {
-    @Published var news: [NetworkNews] = []
-    private var cancelables = Set<AnyCancellable>()
+    let news: Dynamic<[NetworkNews]> = Dynamic(value: [])
     
 
     let fetchNetworkNewsUseCase:FetchNetworkNewsUseCaseProtocol
@@ -18,20 +16,18 @@ class NewsViewModel {
         self.fetchNetworkNewsUseCase = fetchNetworkNewsUseCase
     }
     
-    func getNews(category:NewsCategory) {
-        fetchNetworkNewsUseCase.executeFetch(category: category)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .failure(let error):
-                    print(error)
-                default: break
-                }
-            } receiveValue: { [weak self] news in
-                self?.news = news
-            }
-            .store(in: &cancelables)
-    }
+    func getNews(category: NewsCategory) {
+           fetchNetworkNewsUseCase.executeFetch(category: category) { [weak self] result in
+               DispatchQueue.main.async {
+                   switch result {
+                   case .success(let news):
+                       self?.news.value = news
+                   case .failure(let error):
+                       print("Error: \(error)")
+                   }
+               }
+           }
+       }
 }
 
 

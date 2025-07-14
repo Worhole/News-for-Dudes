@@ -19,18 +19,16 @@ final class BookmarksDataSource:BookmarksDataSourceProtocol{
         appDelegate.persistentContainer.viewContext
     }
     
-    func fetchBookmarks() -> AnyPublisher<[Bookmarks], any Error> {
-        Future { promise in
-            self.context.perform {
-                do {
-                    let fetchRequest = Bookmarks.fetchRequest()
-                    let results = try self.context.fetch(fetchRequest)
-                    promise(.success(results))
-                } catch {
-                    promise(.failure(error))
-                }
+    func fetchBookmarks(completion: @escaping (Result<[Bookmarks], Error>) -> Void) {
+        context.perform {
+            do {
+                let fetchRequest = Bookmarks.fetchRequest()
+                let results = try self.context.fetch(fetchRequest)
+                completion(.success(results))
+            } catch {
+                completion(.failure(error))
             }
         }
-        .eraseToAnyPublisher()
     }
+
 }

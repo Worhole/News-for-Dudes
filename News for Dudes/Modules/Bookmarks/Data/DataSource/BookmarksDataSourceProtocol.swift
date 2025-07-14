@@ -5,8 +5,8 @@
 //  Created by 71m3 on 2025-07-14.
 //
 
-import Combine
+import Foundation
 
 protocol BookmarksDataSourceProtocol {
-  func fetchBookmarks() -> AnyPublisher<[Bookmarks],any Error>
+    func fetchBookmarks(completion: @escaping (Result<[Bookmarks], Error>) -> Void)
 }

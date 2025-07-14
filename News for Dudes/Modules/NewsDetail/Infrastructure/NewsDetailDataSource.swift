@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Combine
 import CoreData
 
 
@@ -28,17 +27,13 @@ final class NewsDetailDataSource:NewsDetailDataSourceProtocol{
         self.mode = mode
     }
     
-    func getNews() -> AnyPublisher<NewsDetailModel, any Error> {
+    func getNews(completion: @escaping (Result<NewsDetailModel, Error>) -> Void) {
         guard let news = model else {
-            return Fail(error: NSError(domain: "NewsDetailDataSource", code: -1, userInfo: [NSLocalizedDescriptionKey: "News = nil"]))
-                .eraseToAnyPublisher()
+            completion(.failure(NSError(domain: "NewsDetailDataSource", code: -1, userInfo: [NSLocalizedDescriptionKey: "News = nil"])))
+            return
         }
-        
-        return Just(news)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
+        completion(.success(news))
     }
-    
     
     func saveNews() {
         guard let bookmarksEntifyDescription = NSEntityDescription.entity(forEntityName: "Bookmarks", in: context) else {return}

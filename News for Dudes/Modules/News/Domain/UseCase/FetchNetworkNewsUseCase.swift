@@ -5,11 +5,11 @@
 //  Created by 71m3 on 2025-07-08.
 //
 
-import Combine
+import Foundation
 
 
 protocol FetchNetworkNewsUseCaseProtocol{
-    func executeFetch(category:NewsCategory)-> AnyPublisher<[NetworkNews],any Error>
+    func executeFetch(category: NewsCategory, completion: @escaping (Result<[NetworkNews], Error>) -> Void)
 }
 
 final class FetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol {
@@ -20,8 +20,8 @@ final class FetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol {
         self.repository = repository
     }
     
-    func executeFetch(category:NewsCategory) -> AnyPublisher<[NetworkNews], any Error> {
-        repository.fetchNetworkNews(category: category)
+    func executeFetch(category: NewsCategory, completion: @escaping (Result<[NetworkNews], any Error>) -> Void) {
+        repository.fetchNetworkNews(category: category, completion: completion)
     }
     
 }

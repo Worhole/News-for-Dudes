@@ -5,11 +5,11 @@
 //  Created by 71m3 on 2025-07-14.
 //
 
-import Combine
+import Foundation
 
 
 protocol NewsDetailRepositoryProtocol{
-    func getNews() -> AnyPublisher<NewsDetailModel,Error>
+    func getNews(completion: @escaping (Result<NewsDetailModel, Error>) -> Void)
     func deleteNews()
     func saveNews()
     func isNewsSaved()->Bool

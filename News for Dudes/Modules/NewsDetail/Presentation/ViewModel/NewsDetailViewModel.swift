@@ -6,16 +6,21 @@
 //
 
 import Foundation
-import Combine
+
 
 class NewsDetailViewModel {
     
-    @Published var viewData:NewsDetailViewData?
-    @Published var isSaved:Bool = false
+    var viewData: ((NewsDetailViewData) -> Void)?
+    var isSaved: ((Bool) -> Void)?
+    
+    private(set) var currentIsSaved: Bool = false {
+        didSet {
+            isSaved?(currentIsSaved)
+        }
+    }
     let mode:NewsDetailMode
     let close:(()->Void)?
     
-    private var cancelables = Set<AnyCancellable>()
     
     let getNewsUseCase:GetNewsUseCaseProtocol
     let saveNewsUseCase:SaveNewsUseCaseProtocol
@@ -32,46 +37,44 @@ class NewsDetailViewModel {
         
         checkIfSavedNews()
     }
-    
-    func getNews(){
-        getNewsUseCase.executeGetNews()
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
+    func getNews() {
+        getNewsUseCase.executeGetNews { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let news):
+                    self?.viewData?(NewsDetailViewData(model: news))
                 case .failure(let error):
                     print(error)
-                default: break
                 }
-            } receiveValue: { [weak self] news in
-                self?.viewData = NewsDetailViewData(model: news)
             }
-            .store(in: &cancelables)
-    }
-    
-    func buttonTapped(){
-        if isSaved {
-            deleteNewsUseCase.executeDeleteNews()
-            saveComplete()
-        } else {
-            saveNewsUseCase.executeSaveNews()
-            saveComplete()
         }
     }
+
+    
+    func buttonTapped() {
+         if currentIsSaved {
+             deleteNewsUseCase.executeDeleteNews()
+             saveComplete()
+         } else {
+             saveNewsUseCase.executeSaveNews()
+             saveComplete()
+         }
+     }
     
 }
 
-private extension NewsDetailViewModel{
-    func checkIfSavedNews(){
+private extension NewsDetailViewModel {
+    
+    func checkIfSavedNews() {
         switch mode {
         case .networkNews:
-            isSaved = checkIfSavedUseCase.executeIsNewsSaved()
+            currentIsSaved = checkIfSavedUseCase.executeIsNewsSaved()
         case .bookmarks:
-            isSaved = true
+            currentIsSaved = true
         }
-       
     }
     
-    func saveComplete(){
+    func saveComplete() {
         checkIfSavedNews()
         if mode == .bookmarks {
             close?()

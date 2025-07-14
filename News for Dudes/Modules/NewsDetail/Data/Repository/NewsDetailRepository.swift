@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 class NewsDetailRepository:NewsDetailRepositoryProtocol{
  
@@ -24,8 +23,8 @@ class NewsDetailRepository:NewsDetailRepositoryProtocol{
         dataSource.saveNews()
     }
 
-    func getNews() -> AnyPublisher<NewsDetailModel, any Error> {
-        dataSource.getNews()
+    func getNews(completion: @escaping (Result<NewsDetailModel, any Error>) -> Void) {
+        dataSource.getNews(completion: completion)
     }
     
     func isNewsSaved() -> Bool {

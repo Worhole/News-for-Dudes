@@ -6,35 +6,44 @@
 //
 
 import Foundation
-import Combine
 
 class BookmarksViewModel {
-    @Published var bookmarks = [Bookmarks]()
-    
-    private var cancelables = Set<AnyCancellable>()
-    
-    let fetchBookmarksUseCase:FetchBookmarksUseCaseProtocol
-    init(fetchBookmarksUseCase: FetchBookmarksUseCaseProtocol) {
-        self.fetchBookmarksUseCase = fetchBookmarksUseCase
-        NotificationCenter.default.publisher(for: Notification.Name("didChange"))
-            .sink { [weak self] _ in
-            self?.fetchBookmarks()
-            }.store(in: &cancelables)
-    }
-    
-    func fetchBookmarks(){
-        fetchBookmarksUseCase.executeFetch()
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .failure(let error):
-                    print(error)
-                default: break
-                }
-            } receiveValue: { [weak self] bookmarks in
-                self?.bookmarks = bookmarks
-            }
-            .store(in: &cancelables)
-    }
+    var bookmarks: Dynamic<[Bookmarks]> = Dynamic(value: [])
+      
+      let fetchBookmarksUseCase: FetchBookmarksUseCaseProtocol
+      
+      init(fetchBookmarksUseCase: FetchBookmarksUseCaseProtocol) {
+          self.fetchBookmarksUseCase = fetchBookmarksUseCase
+          
+          NotificationCenter.default.addObserver(
+              self,
+              selector: #selector(bookmarksDidChange),
+              name: Notification.Name("didChange"),
+              object: nil
+          )
+          
+          fetchBookmarks()
+      }
+      
+      deinit {
+          NotificationCenter.default.removeObserver(self)
+      }
+      
+      @objc private func bookmarksDidChange() {
+          fetchBookmarks()
+      }
+      
+      func fetchBookmarks() {
+          fetchBookmarksUseCase.executeFetchBookmarks(completion: { [weak self] result in
+              DispatchQueue.main.async {
+                  switch result {
+                  case .success(let bookmarks):
+                      self?.bookmarks.value = bookmarks
+                  case .failure(let error):
+                      print(error)
+                  }
+              }
+          })
+      }
    
 }

@@ -10,7 +10,6 @@ import Combine
 
 class NewsViewController: UIViewController {
     
-    private var subscriptions = Set<AnyCancellable>()
     var viewModel:NewsViewModel?
     
     var categorySelector = CategorySelector()
@@ -35,12 +34,10 @@ class NewsViewController: UIViewController {
 
 private extension NewsViewController {
     func setupBind(){
-        viewModel?.$news
-            .receive(on: DispatchQueue.main)
-            .sink{_ in 
-                self.newsTableView.reloadData()
-            }
-            .store(in: &subscriptions)
+        viewModel?.news.bind({ [weak self] _ in
+            guard let self = self else {return}
+            self.newsTableView.reloadData()
+        })
     }
 }
 
@@ -109,7 +106,7 @@ extension NewsViewController:CategorySelectorDelegate {
 
 extension NewsViewController:UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let news = viewModel?.news[indexPath.row] else{
+        guard let news = viewModel?.news.value[indexPath.row] else{
             print("ошибка данных: news = nil")
             return}
         let vc = NewsDetailModuleBuilder.build(data: news.toDisplayModel(), mode: .networkNews, close: {})
@@ -121,14 +118,15 @@ extension NewsViewController:UITableViewDelegate {
 // MARK: -- UITableViewDataSource
 extension NewsViewController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel?.news.count ?? 0
+        viewModel?.news.value.count ?? 0
+        
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.reuseId) as! NewsTableViewCell
         
-        cell.configue(title: viewModel?.news[indexPath.row].title,
-                      description: viewModel?.news[indexPath.row].description,
-                      source: viewModel?.news[indexPath.row].source.name)
+        cell.configue(title: viewModel?.news.value[indexPath.row].title,
+                      description: viewModel?.news.value[indexPath.row].description,
+                      source: viewModel?.news.value[indexPath.row].source.name)
         return cell
     }
 }

@@ -5,10 +5,10 @@
 //  Created by 71m3 on 2025-07-14.
 //
 
-import Combine
+import Foundation
 
 protocol FetchBookmarksUseCaseProtocol {
-    func executeFetch()-> AnyPublisher<[Bookmarks],any Error>
+    func executeFetchBookmarks(completion: @escaping (Result<[Bookmarks], Error>) -> Void)
 }
 
 final class FetchBookmarksUseCase:FetchBookmarksUseCaseProtocol{
@@ -19,8 +19,8 @@ final class FetchBookmarksUseCase:FetchBookmarksUseCaseProtocol{
         self.repository = repository
     }
     
-    func executeFetch() -> AnyPublisher<[Bookmarks], any Error> {
-        repository.fetchBookmarks()
+    func executeFetchBookmarks(completion: @escaping (Result<[Bookmarks], any Error>) -> Void) {
+        repository.fetchBookmarks(completion: completion)
     }
     
 }
