@@ -14,9 +14,9 @@ protocol FetchNetworkNewsUseCaseProtocol{
 
 final class FetchNetworkNewsUseCase: FetchNetworkNewsUseCaseProtocol {
     
-    private let repository:FetchNetworkNewsRepository
+    private let repository:FetchNetworkNewsRepositoryProtocol
     
-    init(repository: FetchNetworkNewsRepository) {
+    init(repository: FetchNetworkNewsRepositoryProtocol) {
         self.repository = repository
     }
     

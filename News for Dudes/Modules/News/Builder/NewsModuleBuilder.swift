@@ -10,8 +10,8 @@ import Foundation
 class NewsModuleBuilder {
     static func build()->NewsViewController{
         
-        let dataSource = FetchNetworkNewsDataSource()
-        let repository = FetchNetworkNewsRepository(fetchNetworkNewsDataSource: dataSource)
+        let dataSource = NewsDataSource()
+        let repository = FetchNetworkNewsRepository(dataSource: dataSource)
         let useCase = FetchNetworkNewsUseCase(repository: repository)
         let viewModel = NewsViewModel(fetchNetworkNewsUseCase: useCase)
         let view = NewsViewController()

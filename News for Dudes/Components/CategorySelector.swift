@@ -100,8 +100,7 @@ public class CategorySelector: UIView {
         let potentialOffset = selectedTab.frame.midX - scrollView.bounds.width / 2
         let maxOffset = scrollView.contentSize.width - scrollView.bounds.width
         let offset = max(0, min(potentialOffset, maxOffset))
-        
-        print("offset = \(offset),  --- , maxOffset = \(maxOffset),   --- , potentialOffset = \(potentialOffset) ")
+     
         scrollView.setContentOffset(CGPoint(x: offset, y: 0), animated: true)
     }
 }

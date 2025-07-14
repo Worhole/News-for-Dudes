@@ -13,8 +13,11 @@ public class TabView: UIView {
 
     public var active: Bool = false {
         didSet {
-            backgroundColor = active ? .systemBlue : .systemGray5
-            titleLabel.textColor = active ? .white : .black
+            backgroundColor = active ? UIColor {
+                $0.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.2) : UIColor.black.withAlphaComponent(0.1)
+              }
+            : .clear
+            titleLabel.textColor = active ? UIColor.label : UIColor.secondaryLabel
         }
     }
 

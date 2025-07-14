@@ -8,8 +8,8 @@
 import Combine
 import Foundation
 
-class FetchNetworkNewsDataSource:FetchNetworkNewsDataSourceProtocol {
-    func getNetworkNews(category: NewsCategory) -> AnyPublisher<[NetworkNews], any Error> {
+final class NewsDataSource:NewsDataSourceProtocol {
+    func fetchNetworkNews(category: NewsCategory) -> AnyPublisher<[NetworkNews], any Error> {
         guard let url = NewsURLBuilder(newsCategory: category).url else {
             return Fail(error: URLError.badURL as! Error).eraseToAnyPublisher()
         }

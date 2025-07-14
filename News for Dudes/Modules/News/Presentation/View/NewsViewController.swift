@@ -20,6 +20,7 @@ class NewsViewController: UIViewController {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.dataSource = self
         $0.delegate = self
+        $0.showsVerticalScrollIndicator = false
         $0.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.reuseId)
         return $0
     }(UITableView())
@@ -45,7 +46,7 @@ private extension NewsViewController {
 
 private extension NewsViewController {
     func setupLayout(){
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(newsTableView)
         NSLayoutConstraint.activate([
@@ -63,7 +64,6 @@ private extension NewsViewController {
         for title in categoryTitles {
             let tab = TabView()
             tab.title = title
-            tab.translatesAutoresizingMaskIntoConstraints = false
             tabViews.append(tab)
         }
         categorySelector.delegate = self
@@ -108,7 +108,14 @@ extension NewsViewController:CategorySelectorDelegate {
 // MARK: -- UITableViewDelegate
 
 extension NewsViewController:UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let news = viewModel?.news[indexPath.row] else{
+            print("ошибка данных: news = nil")
+            return}
+        let vc = NewsDetailModuleBuilder.build(data: news.toDisplayModel(), mode: .networkNews, close: {})
+        navigationController?.pushViewController(vc, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
 
 // MARK: -- UITableViewDataSource
@@ -116,14 +123,12 @@ extension NewsViewController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel?.news.count ?? 0
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.reuseId) as! NewsTableViewCell
         
         cell.configue(title: viewModel?.news[indexPath.row].title,
                       description: viewModel?.news[indexPath.row].description,
-                      source: viewModel?.news[indexPath.row].author)
-        
+                      source: viewModel?.news[indexPath.row].source.name)
         return cell
     }
 }

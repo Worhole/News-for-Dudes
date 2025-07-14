@@ -9,14 +9,14 @@ import Combine
 
 final class FetchNetworkNewsRepository: FetchNetworkNewsRepositoryProtocol {
     
-    private let fetchNetworkNewsDataSource:FetchNetworkNewsDataSourceProtocol
+    private let dataSource:NewsDataSourceProtocol
     
-    init(fetchNetworkNewsDataSource: FetchNetworkNewsDataSourceProtocol) {
-        self.fetchNetworkNewsDataSource = fetchNetworkNewsDataSource
+    init(dataSource: NewsDataSourceProtocol) {
+        self.dataSource = dataSource
     }
     
     func fetchNetworkNews(category:NewsCategory) -> AnyPublisher<[NetworkNews],any Error> {
-        fetchNetworkNewsDataSource.getNetworkNews(category: category)
+        dataSource.fetchNetworkNews(category: category)
     }
 
 }

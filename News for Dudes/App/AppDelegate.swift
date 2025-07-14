@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -29,6 +30,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
+    lazy var persistentContainer:NSPersistentContainer = {
+        let conteiner = NSPersistentContainer(name: "NewsStorageModel")
+        conteiner.loadPersistentStores { description, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print("db is created \(String(describing: description.url))")
+            }
+        }
+        conteiner.viewContext.automaticallyMergesChangesFromParent = true
+        return conteiner
+    }()
+    
+    func saveContext(){
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do{
+                try context.save()
+            } catch {
+                let error = error as NSError
+                fatalError(error.localizedDescription)
+            }
+        }
+    }
 
 }
 
